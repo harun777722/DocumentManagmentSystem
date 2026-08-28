@@ -39,11 +39,19 @@ public class DocumentController {
         return documentService.getDocumentById(id);
     }
 
+
+
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<Document> creatDocument(@RequestParam("file") MultipartFile file ,
-                                                  @RequestParam("title") String title ,
-                                                  @RequestParam("uploaderId") Long uploaderId)throws IOException{
-        Document savedDocument = documentService.creatDocument(file,title,uploaderId);
+    public ResponseEntity<Document> creatDocument(@RequestParam("file") MultipartFile file,
+                                                  @RequestParam("title") String title,
+                                                  Authentication authentication) throws IOException {
+
+        // 1. İstek atan kişinin e-postasını token'dan alıyoruz
+        String userEmail = authentication.getName();
+
+        // 2. Servis katmanına ID yerine e-postayı gönderiyoruz (veya serviste e-postadan kullanıcıyı buluyoruz)
+        Document savedDocument = documentService.creatDocument(file, title,userEmail);
+
         return ResponseEntity.ok(savedDocument);
     }
 

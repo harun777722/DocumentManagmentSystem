@@ -5,6 +5,7 @@ import com.example.DocumentManagementSystem.Service.ApprovalWorkflowService;
 import com.example.DocumentManagementSystem.entity.ApprovalStep;
 import com.example.DocumentManagementSystem.repository.ApprovalStepRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -102,10 +103,17 @@ public class ApprovalStepController {
         return ResponseEntity.ok(response);
     }
     @GetMapping
-    public ResponseEntity<List<ApprovalStep>> getAllSteps() {
-        // Veritabanındaki onay adımlarını çekip React'e (Frontend'e) gönderiyoruz
-        List<ApprovalStep> steps = stepRepository.findAll();
+    public ResponseEntity<List<ApprovalStep>> getMyPendingSteps() {
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<ApprovalStep> mySteps = stepRepository.findByApproverEmailAndStatus(currentUserEmail, "PENDING");
+        return ResponseEntity.ok(mySteps);
+    }
 
+    // 2. ADMİNLER VE TESTLER İÇİN (Eski kodunu koruduk, sadece adresine "/all" ekledik)
+    @GetMapping("/all")
+    public ResponseEntity<List<ApprovalStep>> getAllSteps() {
+        // Veritabanındaki tüm onay adımlarını çekip gönderiyoruz
+        List<ApprovalStep> steps = stepRepository.findAll();
         return ResponseEntity.ok(steps);
     }
 }

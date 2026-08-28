@@ -13,4 +13,6 @@ public interface ApprovalStepRepository  extends JpaRepository<ApprovalStep , Lo
 
     boolean existsByDocumentIdAndStatus(Long documentId, String status);
 
+    List<ApprovalStep> findByApproverEmailAndStatus(String email, String status);
+
 }

@@ -41,7 +41,6 @@ public class DocumentService {
     private ApprovalWorkflowService approvalWorkflowService;
 
     private final String UPLOAD_DIR = "uploads/";
-    // dosyaların kaydedileceği yerel klasör yolu
 
     public List<Document> getAllDocuments() {
         return documentRepository.findAll();
@@ -56,7 +55,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public Document creatDocument(MultipartFile file, String title, Long uploaderId) throws IOException {
+    public Document creatDocument(MultipartFile file, String title, String userEmail) throws IOException {
 
 
         File uploadDir = new File(UPLOAD_DIR);
@@ -68,7 +67,7 @@ public class DocumentService {
         Path filePath = Paths.get(UPLOAD_DIR + uniqueFileName);
         Files.copy(file.getInputStream(), filePath);
 
-        User uploader = userRepository.findById(uploaderId)
+        User uploader = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Belgeyi yükleyen kullanıcı bulunamadı!"));
 
         Document document = new Document();
