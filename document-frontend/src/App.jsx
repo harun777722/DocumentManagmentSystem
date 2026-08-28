@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import Register from './Register';
 
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState('USER');
 
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  const [userRole, setUserRole] = useState('USER');
   const [steps, setSteps] = useState([]);
   const [myDocuments, setMyDocuments] = useState([]);
-
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadTitle, setUploadTitle] = useState('');
 
@@ -85,8 +87,6 @@ function App() {
     formData.append('file', uploadFile);
     formData.append('title', uploadTitle);
 
-
-
     try {
       const token = localStorage.getItem('token');
       await axios.post('http://localhost:8080/api/documents', formData, {
@@ -147,13 +147,11 @@ function App() {
     }
   }, [isLoggedIn]);
 
+  // EĞER KULLANICI GİRİŞ YAPTIYSA ANA PANELİ GÖSTER
   if (isLoggedIn) {
     return (
       <div style={{ padding: '40px 20px', fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif', maxWidth: '1100px', margin: '0 auto', color: '#e0e0e0', backgroundColor: '#121212', minHeight: '100vh' }}>
-        <h2 style={{ textAlign: 'center', color: '#ffffff', marginBottom: '30px', letterSpacing: '1px' }}
-
-        >Belge Yönetim Paneli</h2>
-
+        <h2 style={{ textAlign: 'center', color: '#ffffff', marginBottom: '30px', letterSpacing: '1px' }}>Belge Yönetim Paneli</h2>
 
         {userRole === 'ADMIN' && (
           <div style={{ marginBottom: '20px', textAlign: 'left' }}>
@@ -165,10 +163,8 @@ function App() {
           </div>
         )}
 
-        {/* YENİ BELGE YÜKLEME KUTUSU (Koyu Tema Uyumlu) */}
         <div style={{ backgroundColor: '#1e1e1e', padding: '25px', borderRadius: '10px', marginBottom: '35px', border: '1px solid #333', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-          <h4 style={{ margin: '0 0 15px 0', color: '#00adb5', fontSize: '18px' }}
-          > Yeni Belge Yükle</h4>
+          <h4 style={{ margin: '0 0 15px 0', color: '#00adb5', fontSize: '18px' }}> Yeni Belge Yükle</h4>
           <form onSubmit={handleUpload} style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
             <input
               type="text"
@@ -188,9 +184,7 @@ function App() {
           </form>
         </div>
 
-        {/* ONAY BEKLEYENLER TABLOSU */}
-        <h3 style={{ color: '#fff', borderBottom: '2px solid #333', paddingBottom: '8px' }}
-        >Bana Onaya Gelen Belgeler</h3>
+        <h3 style={{ color: '#fff', borderBottom: '2px solid #333', paddingBottom: '8px' }}>Bana Onaya Gelen Belgeler</h3>
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', backgroundColor: '#1e1e1e', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
           <thead>
             <tr style={{ backgroundColor: '#252525', color: '#00adb5', textAlign: 'left' }}>
@@ -227,9 +221,7 @@ function App() {
 
         <div style={{ margin: '50px 0' }}></div>
 
-        {/* BENİM YÜKLEDİĞİM BELGELER TABLOSU */}
-        <h3 style={{ color: '#fff', borderBottom: '2px solid #333', paddingBottom: '8px' }}
-        >Benim Yüklediğim Belgeler</h3>
+        <h3 style={{ color: '#fff', borderBottom: '2px solid #333', paddingBottom: '8px' }}>Benim Yüklediğim Belgeler</h3>
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', backgroundColor: '#1e1e1e', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
           <thead>
             <tr style={{ backgroundColor: '#252525', color: '#00adb5', textAlign: 'left' }}>
@@ -274,18 +266,40 @@ function App() {
             )}
           </tbody>
         </table>
-
       </div>
     );
   }
 
+  // EĞER "KAYIT OL" BUTONUNA BASILDIYSA YENİ BİLEŞENİ GÖSTER
+  if (isRegistering) {
+    return (
+      <div style={{ backgroundColor: '#121212', minHeight: '100vh', position: 'relative' }}>
+        <button
+          onClick={() => setIsRegistering(false)}
+          style={{ position: 'absolute', top: '20px', left: '20px', padding: '10px 20px', backgroundColor: '#333', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+          ⬅ Giriş Ekranına Dön
+        </button>
+        <Register />
+      </div>
+    );
+  }
+
+  // EĞER HİÇBİRİ DEĞİLSE STANDART GİRİŞ (LOGIN) EKRANINI GÖSTER
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#121212', fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
       <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', width: '340px', padding: '30px', backgroundColor: '#1e1e1e', borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.6)', border: '1px solid #333' }}>
         <h2 style={{ textAlign: 'center', color: '#fff', marginBottom: '25px', fontSize: '22px' }}>Sistem Girişi</h2>
         <input type="email" placeholder="E-posta adresiniz" value={email} onChange={(e) => setEmail(e.target.value)} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#2a2a2a', color: 'white', marginBottom: '15px', outline: 'none' }} />
         <input type="password" placeholder="Şifreniz" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: '12px', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#2a2a2a', color: 'white', marginBottom: '20px', outline: 'none' }} />
-        <button type="submit" style={{ padding: '12px', backgroundColor: '#00adb5', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '6px', fontWeight: 'bold', fontSize: '15px' }}>Giriş Yap</button>
+
+        <button type="submit" style={{ padding: '12px', backgroundColor: '#00adb5', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '6px', fontWeight: 'bold', fontSize: '15px' }}>
+          Giriş Yap
+        </button>
+
+
+        <button type="button" onClick={() => setIsRegistering(true)} style={{ padding: '12px', backgroundColor: '#333', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '6px', fontWeight: 'bold', fontSize: '15px', marginTop: '10px' }}>
+            Yeni Kayıt Ekle
+        </button>
       </form>
     </div>
   );
